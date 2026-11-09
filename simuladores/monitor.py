@@ -1,15 +1,24 @@
 from simuladores.barramento import abrir_barramento
+from simuladores.mensagens import DB
 
-ID_PEDAL = 0x100
+
+def formatar(valor):
+    return f"{valor:.1f}" if isinstance(valor, float) else str(valor)
 
 
 def main():
     bus = abrir_barramento()
     try:
         for msg in bus:
-            if msg.arbitration_id == ID_PEDAL:
-                pedal = int.from_bytes(msg.data[0:2], "little") / 10
-                print(f"Pedal: {pedal:5.1f} %")
+            try:
+                definicao = DB.get_message_by_frame_id(msg.arbitration_id)
+            except KeyError:
+                print(f"ID desconhecido: 0x{msg.arbitration_id:03X}")
+                continue
+
+            sinais = definicao.decode(msg.data)
+            texto = "  ".join(f"{nome}={formatar(v)}" for nome, v in sinais.items())
+            print(f"{definicao.name:<12} {texto}")
     except KeyboardInterrupt:
         pass
     finally:
