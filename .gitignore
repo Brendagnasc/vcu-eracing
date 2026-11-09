@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Build C / firmware
+build/
+*.o
+*.elf
+*.bin
+*.hex
+*.map
+
+# Renode e logs
+*.log
